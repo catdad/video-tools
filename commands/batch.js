@@ -18,10 +18,17 @@ async function handler(argv) {
   const command = require(`./${argv.command}.js`);
   const files = (await globby(argv.globs)).sort();
 
+  if (argv.dry) {
+    log.info('batch process files:');
+    log.info(files.join('\n'));
+
+    return;
+  }
+
   const commandArgv = commandYargs(command.builder);
 
   for (let file of files) {
-    log.info('batch process:', file);
+    log.info('processing file:', file);
 
     try {
       await command.handler(Object.assign({}, commandArgv, {
@@ -38,5 +45,13 @@ async function handler(argv) {
 module.exports = {
   command: 'batch <command> [globs..]',
   describe: 'execute any other command on a glob of files',
+  builder: function (yargs) {
+    yargs
+    .option('dry', {
+      type: 'boolean',
+      describe: 'dry-run only, prints files without processing them',
+      default: false
+    });
+  },
   handler
 };
