@@ -25,7 +25,13 @@ async function handler(argv) {
 }
 
 module.exports = {
-  command: 'container [options] <input>',
+  command: 'container <input> [options]',
   describe: 'switch format container without transcoding',
+  builder: function (yargs) {
+    yargs.option('format', {
+      type: 'string',
+      default: 'mp4'
+    });
+  },
   handler
 };
