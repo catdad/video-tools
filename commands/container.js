@@ -1,30 +1,44 @@
 const path = require('path');
 
 const { ffmpeg } = require('../lib/ffmpeg.js');
-const { setExt } = require('../lib/util.js');
+const { rename, log } = require('../lib/util.js');
 
-async function handler(argv) {
-  var infile = path.resolve(argv.input);
-  var outfile = setExt(infile, argv.format);
+async function handler({ input, format, ...argv }) {
+  const infile = path.resolve(input);
+  const outfile = rename(infile, {
+    ext: `.${format}`,
+    ...argv
+  });
 
-  console.log('input: ', infile);
-  console.log('output:', outfile);
+  log.info('input: ', infile);
+  log.info('output:', outfile);
 
   if (infile === outfile) {
     throw new Error('input and output are the same');
   }
 
   // ffmpeg -i %1 -vcodec copy -acodec copy -movflags faststart %2
-  await ffmpeg(`-i "${infile}" -vcodec copy -acodec copy ${argv.format === 'mp4' ? '-movflags faststart' : ''} "${outfile}"`);
+  await ffmpeg(`-i "${infile}" -vcodec copy -acodec copy ${format === 'mp4' ? '-movflags faststart' : ''} "${outfile}"`);
 }
 
 module.exports = {
   command: 'container <input> [options]',
   describe: 'switch format container without transcoding',
   builder: function (yargs) {
-    yargs.option('format', {
+    yargs
+    .option('format', {
       type: 'string',
       default: 'mp4'
+    })
+    .option('prefix', {
+      type: 'string',
+      alias: 'p',
+      describe: 'prepend the output name'
+    })
+    .option('suffix', {
+      type: 'string',
+      alias: 's',
+      describe: 'append the output name'
     });
   },
   handler
