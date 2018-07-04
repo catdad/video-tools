@@ -1,7 +1,7 @@
 const path = require('path');
 
 const { ffmpeg } = require('../lib/ffmpeg.js');
-const { rename } = require('../lib/util.js');
+const { rename, log } = require('../lib/util.js');
 
 function codecs(opts) {
   const v = 'libx264';
@@ -28,8 +28,8 @@ async function handler(argv) {
     ext: '.mp4'
   });
 
-  console.log('input: ', infile);
-  console.log('output:', outfile);
+  log.info('input: ', infile);
+  log.info('output:', outfile);
 
   if (infile === outfile) {
     throw new Error('input and output are the same');
