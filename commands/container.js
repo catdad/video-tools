@@ -1,17 +1,11 @@
 const path = require('path');
 
 const { ffmpeg } = require('../lib/ffmpeg.js');
+const { setExt } = require('../lib/util.js');
 
 async function handler(argv) {
   var infile = path.resolve(argv.input);
-  var outfile = (function (obj, format = 'mp4') {
-    var name = path.basename(obj.base, obj.ext);
-
-    obj.ext = `.${format}`;
-    obj.base = `${name}${obj.ext}`;
-
-    return path.format(obj);
-  }(path.parse(infile), argv.format));
+  var outfile = setExt(infile, argv.format);
 
   console.log('input: ', infile);
   console.log('output:', outfile);
