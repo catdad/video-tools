@@ -1,3 +1,7 @@
 #!/usr/bin/env node
 
-var argv = require('yargs').commandDir('commands').help().argv;
+var argv = require('yargs')
+.commandDir('commands')
+.demandCommand()
+.help()
+.argv;
