@@ -13,7 +13,7 @@ async function handler(argv) {
     return path.format(obj);
   }(path.parse(infile), argv.format));
 
-  console.log('input:', infile);
+  console.log('input: ', infile);
   console.log('output:', outfile);
 
   if (infile === outfile) {
