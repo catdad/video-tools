@@ -16,7 +16,7 @@ function commandYargs(builder) {
 
 async function handler(argv) {
   const command = require(`./${argv.command}.js`);
-  const files = await globby(argv.glob);
+  const files = await globby(argv.globs);
 
   const commandArgv = commandYargs(command.builder);
 
@@ -36,8 +36,7 @@ async function handler(argv) {
 }
 
 module.exports = {
-  command: 'batch <command> <glob> [options]',
+  command: 'batch <command> [globs..]',
   describe: 'execute any other command on a glob of files',
-//  builder: function (yargs) {},
   handler
 };
