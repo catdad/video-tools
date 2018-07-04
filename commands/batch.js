@@ -16,7 +16,7 @@ function commandYargs(builder) {
 
 async function handler(argv) {
   const command = require(`./${argv.command}.js`);
-  const files = await globby(argv.globs);
+  const files = (await globby(argv.globs)).sort();
 
   const commandArgv = commandYargs(command.builder);
 
