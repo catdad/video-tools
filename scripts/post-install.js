@@ -1,6 +1,9 @@
 /* jshint node: true */
 /* global Promise */
 
+// script copied from localcasst
+// https://github.com/catdad/localcast/blob/master/scripts/post-install.js
+
 var os = require('os');
 var fs = require('fs');
 var path = require('path');
