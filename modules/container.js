@@ -20,8 +20,6 @@ async function handler(argv) {
     throw new Error('input and output are the same');
   }
 
-
-
   // ffmpeg -i %1 -vcodec copy -acodec copy -movflags faststart %2
   await ffmpeg(`-i "${infile}" -vcodec copy -acodec copy ${argv.format === 'mp4' ? '-movflags faststart' : ''} "${outfile}"`);
 }
