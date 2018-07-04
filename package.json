@@ -24,6 +24,8 @@
     "node": ">=8.0.0"
   },
   "dependencies": {
+    "chalk": "^2.4.1",
+    "globby": "^8.0.1",
     "mkdirp": "^0.5.1",
     "rootrequire": "^1.0.0",
     "shellton": "^4.1.0",
