@@ -1,8 +1,7 @@
-/* jshint node: true */
-/* global Promise */
-
 // script copied from localcasst
 // https://github.com/catdad/localcast/blob/master/scripts/post-install.js
+
+/* eslint-disable no-console */
 
 var os = require('os');
 var fs = require('fs');
