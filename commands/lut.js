@@ -23,10 +23,10 @@ async function handler(argv) {
   const lutfile = lutPath(argv.lut);
   const infile = path.resolve(argv.input);
   const outfile = argv.out ?
-        path.resolve(argv.out) :
-        rename(infile, {
-          suffix: `.${path.basename(lutfile)}`
-        });
+    path.resolve(argv.out) :
+    rename(infile, {
+      suffix: `.${path.basename(lutfile)}`
+    });
 
   log.info('lut:   ', lutfile);
   log.info('input: ', infile);
