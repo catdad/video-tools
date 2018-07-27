@@ -1,4 +1,4 @@
-# video-tools
+# 🎬 video-tools
 
 This CLI really just makes my life easier. It may not be for everyone. If you are feeling adventurous, you may continue.
 
