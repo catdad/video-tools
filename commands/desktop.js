@@ -92,31 +92,36 @@ module.exports = {
       describe: 'the output file',
       alias: 'o'
     })
-    .option('list', {
-      type: 'boolean',
-      default: false
-    })
     .option('info', {
+      type: 'boolean',
+      default: false,
+      describe: 'show screen size info without capturing video'
+    })
+    .option('list', {
       type: 'boolean',
       default: false
     })
     .option('width', {
       type: 'number',
-      alias: 'w'
+      alias: 'w',
+      describe: 'width of the capture area'
     })
     .option('height', {
       type: 'number',
-      alias: 'h'
+      alias: 'h',
+      describe: 'height of the capture area'
     })
     .options('offsetX', {
       type: 'number',
       alias: 'x',
-      default: 0
+      default: 0,
+      describe: 'x-axis offset for the capture area'
     })
     .options('offsetY', {
       type: 'number',
       alias: 'y',
-      default: 0
+      default: 0,
+      describe: 'y-axis offset for the capture area'
     });
   },
   handler
