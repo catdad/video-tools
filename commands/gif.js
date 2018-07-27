@@ -3,7 +3,19 @@ const path = require('path');
 const { ffmpeg } = require('../lib/ffmpeg.js');
 const { rename, log } = require('../lib/util.js');
 
-async function handler({ seek, duration, framerate = 10, scale = 480, ...argv }) {
+function serializeFilter({ framerate = 10, scale = 480, quality = 'low' }) {
+  let str = `[0:v] fps=${framerate},scale=${scale}:-1,split [a][b]`;
+
+  if (quality === 'high') {
+    // generate one color palette per frame
+    return `${str};[a] palettegen=stats_mode=single [p];[b][p] paletteuse=new=1`;
+  }
+
+  // generate one color palette for the whole gif
+  return `${str};[a] palettegen [p];[b][p] paletteuse`;
+}
+
+async function handler({ seek, duration, ...argv }) {
   const infile = path.resolve(argv.input);
   const outfile = rename(infile, {
     prefix: argv.prefix,
@@ -19,7 +31,7 @@ async function handler({ seek, duration, framerate = 10, scale = 480, ...argv })
   }
 
   const offsets = `${seek ? `-ss ${seek}` : ''} ${duration ? `-t ${duration}` : ''}`;
-  const filter = `[0:v] fps=${framerate},scale=${scale}:-1,split [a][b];[a] palettegen [p];[b][p] paletteuse`;
+  const filter = serializeFilter({ ...argv });
 
   // ffmpeg -ss 61.0 -t 2.5 -i in.mp4 -filter_complex "[0:v] split [a][b];[a] palettegen [p];[b][p] paletteuse" out.gif
   const cmd = `${offsets} -i "${infile}" -filter_complex "${filter}" "${outfile}"`;
