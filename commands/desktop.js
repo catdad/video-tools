@@ -32,11 +32,16 @@ function captureSerializer(os, { width, height, x, y }) {
   throw new Error(`${os.toUpperCase()} operating system capture is not implemented`);
 }
 
-async function listDevices({ os = OS }) {
-  const cmd = os === 'win' ?
-    `-list_devices true -f dshow -i dummy` : '';
+function listSerializer(os) {
+  if (os === 'win') {
+    return `-list_devices true -f dshow -i dummy`;
+  }
 
-  await ffmpeg(cmd).catch(() => {});
+  throw new Error(`${os.toUpperCase()} operating system device list is not implemented`);
+}
+
+async function listDevices({ os = OS }) {
+  await ffmpeg(listSerializer(os)).catch(() => {});
 }
 
 async function handler({ list, output = 'video-recording.mp4', os = OS, ...argv }) {
