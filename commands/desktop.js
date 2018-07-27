@@ -47,7 +47,7 @@ async function listDevices({ os = OS }) {
   await ffmpeg(listSerializer(os)).catch(() => {});
 }
 
-async function thumbnail() {
+async function screenInfo() {
   const outStream = through();
 
   const [buff] = await Promise.all([
@@ -60,24 +60,26 @@ async function thumbnail() {
   log.info({ width: img.bitmap.width, height: img.bitmap.height, ext: img.getExtension() });
 }
 
-async function handler({ list, thumb, output = 'video-recording.mp4', os = OS, ...argv }) {
-  if (thumb) {
-    return thumbnail();
-  }
-
+async function screenRecord({ output = 'video-recording.mp4', os = OS, ...argv }) {
   const outfile = path.resolve('.', output);
-
-  if (list) {
-    return listDevices({ os });
-  }
-
-  log.info('output:', outfile);
-
   const cmd = `${captureSerializer(os, argv)} "${outfile}`;
 
+  log.info('output:', outfile);
   log.info(`ffmpeg ${cmd}`);
 
   await ffmpeg(`${cmd}`);
+}
+
+async function handler({ ...argv }) {
+  if (argv.info) {
+    return screenInfo();
+  }
+
+  if (argv.list) {
+    return listDevices({ ...argv });
+  }
+
+  return screenRecord({ ...argv });
 }
 
 module.exports = {
@@ -91,6 +93,10 @@ module.exports = {
       alias: 'o'
     })
     .option('list', {
+      type: 'boolean',
+      default: false
+    })
+    .option('info', {
       type: 'boolean',
       default: false
     })
