@@ -1,7 +1,10 @@
 const path = require('path');
 
+const through = require('through2');
+const Jimp = require('jimp');
+
 const { ffmpeg } = require('../lib/ffmpeg.js');
-const { log } = require('../lib/util.js');
+const { log, readStream } = require('../lib/util.js');
 
 const OS = (function (platform) {
   switch (platform) {
@@ -44,7 +47,24 @@ async function listDevices({ os = OS }) {
   await ffmpeg(listSerializer(os)).catch(() => {});
 }
 
-async function handler({ list, output = 'video-recording.mp4', os = OS, ...argv }) {
+async function thumbnail() {
+  const outStream = through();
+
+  const [buff] = await Promise.all([
+    readStream(outStream),
+    ffmpeg(`-f gdigrab -i desktop -y -f mjpeg -vframes 1 -`, { stdout: outStream })
+  ]);
+
+  const img = await Jimp.read(buff);
+
+  log.info({ width: img.bitmap.width, height: img.bitmap.height, ext: img.getExtension() });
+}
+
+async function handler({ list, thumb, output = 'video-recording.mp4', os = OS, ...argv }) {
+  if (thumb) {
+    return thumbnail();
+  }
+
   const outfile = path.resolve('.', output);
 
   if (list) {
