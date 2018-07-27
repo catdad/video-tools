@@ -14,6 +14,24 @@ const OS = (function (platform) {
   }
 }(process.platform))
 
+function isNumber(val) {
+  return Number(val) === val;
+}
+
+function captureSerializer(os, { width, height, x, y }) {
+  // https://trac.ffmpeg.org/wiki/Capture/Desktop
+
+  const videoSize = isNumber(width * height) ?
+    `-video_size ${width}x${height} -show_region 1` :
+    '';
+
+  if (os === 'win') {
+    return `-f gdigrab -framerate 30 -offset_x ${x} -offset_y ${y} ${videoSize} -i desktop`;
+  }
+
+  throw new Error(`${os.toUpperCase()} operating system capture is not implemented`);
+}
+
 async function listDevices({ os = OS }) {
   const cmd = os === 'win' ?
     `-list_devices true -f dshow -i dummy` : '';
@@ -30,19 +48,10 @@ async function handler({ list, output = 'video-recording.mp4', os = OS, ...argv 
 
   log.info('output:', outfile);
 
-  const videoSize = argv.width && argv.height ?
-    `-video_size ${argv.width}x${argv.height} -show_region 1` :
-    '';
-
-  let cmd = os === 'win' ?
-    `-f gdigrab -framerate 30 -offset_x ${argv.x} -offset_y ${argv.y} ${videoSize} -i desktop` :
-    '';
-
-  cmd += ` "${outfile}`;
+  const cmd = `${captureSerializer(os, argv)} "${outfile}`;
 
   log.info(`ffmpeg ${cmd}`);
 
-  // https://trac.ffmpeg.org/wiki/Capture/Desktop
   await ffmpeg(`${cmd}`);
 }
 
