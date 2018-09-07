@@ -54,6 +54,11 @@ module.exports = {
       alias: 's',
       describe: 'append the output name'
     })
+    .option('output', {
+      type: 'string',
+      alias: 'o',
+      describe: 'the output name'
+    })
     .option('seek', {
       type: 'number',
       default: 0,
