@@ -39,6 +39,11 @@ module.exports = {
       type: 'string',
       alias: 's',
       describe: 'append the output name'
+    })
+    .option('output', {
+      type: 'string',
+      alias: 'o',
+      describe: 'the output name'
     });
   },
   handler
