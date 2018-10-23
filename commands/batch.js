@@ -16,7 +16,9 @@ function commandYargs(builder) {
 
 async function handler(argv) {
   const command = require(`./${argv.command}.js`);
-  const files = (await globby(argv.globs)).sort();
+  const files = (await globby(argv.globs)).sort((a, b) => {
+    return a.localeCompare(b);
+  });
 
   if (argv.dry) {
     log.info('batch process files:');
