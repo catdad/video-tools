@@ -20,6 +20,18 @@ function codecs(opts) {
   throw new Error('bad codec options');
 }
 
+function size(argv) {
+  const def = -2;
+  const width = argv.width || def;
+  const height = argv.height || def;
+
+  if (width === def && height === def) {
+    return '';
+  }
+
+  return `-vf scale=${width}:${height}`;
+}
+
 async function handler(argv) {
   const infile = path.resolve(argv.input);
   const outfile = rename(infile, {
@@ -36,7 +48,7 @@ async function handler(argv) {
   }
 
   // ffmpeg -i %1 -vcodec libx264 -acodec libmp3lame -movflags faststart -threads 2 %2
-  const cmd = `-i "${infile}" ${codecs(argv)} -movflags faststart -threads ${Math.floor(argv.threads)} "${outfile}"`;
+  const cmd = `-i "${infile}" ${codecs(argv)} ${size(argv)} -movflags faststart -threads ${Math.floor(argv.threads)} "${outfile}"`;
 
   await ffmpeg(cmd);
 }
@@ -72,6 +84,16 @@ module.exports = {
       alias: 'a',
       describe: 'convert only audio',
       default: false
+    })
+    .options('width', {
+      type: 'number',
+      alias: 'w',
+      describe: 'the desired video width'
+    })
+    .options('height', {
+      type: 'number',
+      alias: 'h',
+      describe: 'the desired video height'
     })
     .option('threads', {
       type: 'number',
