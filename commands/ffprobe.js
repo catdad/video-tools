@@ -2,7 +2,7 @@ const { ffprobe } = require('../lib/ffmpeg.js');
 const { log } = require('../lib/util.js');
 
 async function handler() {
-  const args = process.argv.slice(3).join(' ');
+  const args = process.argv.slice(3).map(a => `"${a}"`).join(' ');
 
   log.info(`ffprobe ${args}`);
 
