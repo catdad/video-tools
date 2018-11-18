@@ -16,6 +16,9 @@ async function handler(argv) {
     throw new Error('input and output are the same');
   }
 
+  // seek before providing an input to bind the seek to the iput file itself
+  // if provided after, it will bind to the output, converting the whole
+  // input file before extracting the frame from the converted output (v slow)
   const cmd = `-ss ${argv.time} -i "${infile}" -vframes 1 "${outfile}"`;
 
   await ffmpeg(cmd);
