@@ -1,6 +1,7 @@
 const path = require('path');
 
 const { ffmpeg } = require('../lib/ffmpeg.js');
+const meta = require('../lib/meta.js');
 const { rename, log } = require('../lib/util.js');
 
 function codecs(opts) {
@@ -32,8 +33,26 @@ function size(argv) {
   return `-vf scale=${width}:${height}`;
 }
 
-function rate(argv) {
-  return argv.framerate ? `-r ${argv.framerate}` : '';
+async function rateAsync(argv, infile) {
+  if (!argv.framerate) {
+    return '';
+  }
+
+  let fps;
+
+  // find current frame rate
+  try {
+    const { video: vmeta } = await meta(infile);
+    fps = eval(vmeta.r_frame_rate);
+  } catch (e) {
+    log.error('could not calculate framerate:', e);
+    return '';
+  }
+
+  // allow setting lower framerate but not higher
+  const target = Math.min(fps, argv.framerate);
+
+  return `-r ${target}`;
 }
 
 async function handler(argv) {
@@ -51,8 +70,10 @@ async function handler(argv) {
     throw new Error('input and output are the same');
   }
 
+  const framerate = await rateAsync(argv, infile);
+
   // ffmpeg -i %1 -vcodec libx264 -acodec libmp3lame -movflags faststart -threads 2 %2
-  const cmd = `-i "${infile}" ${codecs(argv)} ${size(argv)} ${rate(argv)} -movflags faststart -threads ${Math.floor(argv.threads)} "${outfile}"`;
+  const cmd = `-i "${infile}" ${codecs(argv)} ${size(argv)} ${framerate} -movflags faststart -threads ${Math.floor(argv.threads)} "${outfile}"`;
 
   await ffmpeg(cmd);
 }
