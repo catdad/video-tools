@@ -32,6 +32,10 @@ function size(argv) {
   return `-vf scale=${width}:${height}`;
 }
 
+function rate(argv) {
+  return argv.framerate ? `-r ${argv.framerate}` : '';
+}
+
 async function handler(argv) {
   const infile = path.resolve(argv.input);
   const outfile = rename(infile, {
@@ -48,7 +52,7 @@ async function handler(argv) {
   }
 
   // ffmpeg -i %1 -vcodec libx264 -acodec libmp3lame -movflags faststart -threads 2 %2
-  const cmd = `-i "${infile}" ${codecs(argv)} ${size(argv)} -movflags faststart -threads ${Math.floor(argv.threads)} "${outfile}"`;
+  const cmd = `-i "${infile}" ${codecs(argv)} ${size(argv)} ${rate(argv)} -movflags faststart -threads ${Math.floor(argv.threads)} "${outfile}"`;
 
   await ffmpeg(cmd);
 }
@@ -94,6 +98,11 @@ module.exports = {
       type: 'number',
       alias: 'h',
       describe: 'the desired video height'
+    })
+    .option('framerate', {
+      type: 'number',
+      alias: 'f',
+      describe: 'the desired video frame rate'
     })
     .option('threads', {
       type: 'number',
