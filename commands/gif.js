@@ -75,6 +75,12 @@ module.exports = {
       default: 10,
       alias: 'fps'
     })
+    .option('quality', {
+      type: 'string',
+      describe: 'high or low quality, low is usually fine',
+      alias: 'q',
+      default: 'low'
+    })
     .option('scale', {
       type: 'number',
       describe: 'the width of the gif',
