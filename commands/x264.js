@@ -85,12 +85,12 @@ module.exports = {
       describe: 'convert only audio',
       default: false
     })
-    .options('width', {
+    .option('width', {
       type: 'number',
       alias: 'w',
       describe: 'the desired video width'
     })
-    .options('height', {
+    .option('height', {
       type: 'number',
       alias: 'h',
       describe: 'the desired video height'
