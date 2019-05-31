@@ -73,7 +73,7 @@ module.exports = {
       type: 'number',
       describe: 'the gif framerate',
       default: 10,
-      alias: 'fps'
+      alias: 'f'
     })
     .option('quality', {
       type: 'string',
