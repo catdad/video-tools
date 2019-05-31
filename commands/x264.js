@@ -22,8 +22,8 @@ function codecs(opts) {
 
 function size(argv) {
   const def = -2;
-  const width = argv.width || def;
-  const height = argv.height || def;
+  const width = argv.width ? `'min(${argv.width},iw)'` : def;
+  const height = argv.height ? `'min(${argv.height},ih)'` : def;
 
   if (width === def && height === def) {
     return '';
