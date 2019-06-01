@@ -25,6 +25,24 @@ This project will fetch a copy of `ffmpeg` for you. Right now, it will only do s
 
 ## Usage
 
-I am not going to keep this README up to date. Instead, once you install it, execute `vid --help` to get all the details.
+I am not going to keep this README up to date. Instead, once you install it, execute `vid --help` to get all the details. These are the commands you'll have:
+
+```bash
+vid <command>
+
+Commands:
+  vid batch <command> [globs..]    execute any other command on a glob of files
+  vid container <input> [options]  switch format container without transcoding
+  vid desktop [options]            switch format container without transcoding
+  vid ffmpeg [options]             ffmpeg passthrough
+  vid ffprobe [options]            ffprode passthrough
+  vid gif <input> [options]        create a gif from a video
+  vid image <input> [options]      extract still image from video
+  vid info <input>                 show ffprobe info
+  vid lut <input>                  apply a LUT to a video or image
+  vid x264 <input> [options]       transcode video to x264 mp4
+```
+
+From here, you can check the help of each command, such as `vid x264 --help`.
 
 If something is missing, feel free to submit a PR.
