@@ -10,7 +10,7 @@ var http = require('http');
 var https = require('https');
 
 var mkdirp = require('mkdirp');
-var unzip = require('unzip');
+var unzip = require('unzipper');
 
 var destination = 'bin/ffmpeg';
 
