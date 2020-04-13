@@ -1,7 +1,7 @@
 const path = require('path');
 
 const through = require('through2');
-const Jimp = require('jimp');
+const JPEG = require('jpeg-js');
 
 const { ffmpeg } = require('../lib/ffmpeg.js');
 const { log, readStream } = require('../lib/util.js');
@@ -55,9 +55,9 @@ async function screenInfo() {
     ffmpeg(`-f gdigrab -i desktop -y -f mjpeg -vframes 1 -`, { stdout: outStream })
   ]);
 
-  const img = await Jimp.read(buff);
+  const { width, height } = JPEG.decode(buff);
 
-  log.info({ width: img.bitmap.width, height: img.bitmap.height, ext: img.getExtension() });
+  log.info({ width: width, height: height, ext: 'jpeg' });
 }
 
 async function screenRecord({ output = 'video-recording.mp4', os = OS, ...argv }) {
