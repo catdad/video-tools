@@ -50,9 +50,11 @@ async function rateAsync(argv, infile) {
   }
 
   // allow setting lower framerate but not higher
-  const target = Math.min(fps, argv.framerate);
+  if (fps < argv.framerate) {
+    return '';
+  }
 
-  return `-r ${target}`;
+  return `-r ${argv.framerate}`;
 }
 
 async function handler(argv) {
