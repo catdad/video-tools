@@ -2,7 +2,9 @@ const { ffmpeg } = require('../lib/ffmpeg.js');
 const { log } = require('../lib/util.js');
 
 async function handler() {
-  const args = process.argv.slice(3).join(' ');
+  const args = process.argv.slice(3).map(a => {
+    return /[ =]/.test(a) ? `"${a}"` : a;
+  }).join(' ');
 
   log.info(`ffmpeg ${args}`);
 
