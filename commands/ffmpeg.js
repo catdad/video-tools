@@ -9,7 +9,9 @@ async function handler() {
   log.info(`ffmpeg ${args}`);
 
   // ignore errors, user can read the screen
-  await ffmpeg(args).catch(() => {});
+  await ffmpeg(args).catch(() => {
+    process.exitCode = 1;
+  });
 }
 
 module.exports = {
