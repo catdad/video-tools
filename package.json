@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "node scripts/post-install.js",
+    "postinstall": "ffbinaries --version 4.0 --output bin",
     "lint": "eslint **/*.js"
   },
   "repository": {
@@ -26,13 +26,12 @@
   },
   "dependencies": {
     "chalk": "^2.4.2",
+    "ffbinaries": "^1.1.4",
     "globby": "^8.0.2",
     "jpeg-js": "^0.3.7",
-    "mkdirp": "^0.5.5",
     "rootrequire": "^1.0.0",
     "shellton": "^5.0.0",
     "through2": "^2.0.5",
-    "unzipper": "^0.10.10",
     "yargs": "^12.0.5"
   },
   "devDependencies": {
