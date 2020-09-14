@@ -15,9 +15,9 @@ function serializeFilter({ framerate = 10, scale = 480, quality = 'low' }) {
   return `${str};[a] palettegen [p];[b][p] paletteuse`;
 }
 
-async function handler({ seek, duration, ...argv }) {
+async function handler({ seek, duration, output, ...argv }) {
   const infile = path.resolve(argv.input);
-  const outfile = rename(infile, {
+  const outfile = output || rename(infile, {
     prefix: argv.prefix,
     suffix: argv.suffix,
     ext: '.gif'
