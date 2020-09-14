@@ -3,9 +3,10 @@ const path = require('path');
 const { ffmpeg } = require('../lib/ffmpeg.js');
 const { rename, log } = require('../lib/util.js');
 
-async function handler(argv) {
-  const infile = path.resolve(argv.input);
-  const outfile = rename(infile, {
+async function handler({ input, output, time }) {
+  const infile = path.resolve(input);
+  const outfile = output || rename(infile, {
+    suffix: `-${time.replace(/:/g, '.')}`,
     ext: '.png'
   });
 
@@ -19,7 +20,7 @@ async function handler(argv) {
   // seek before providing an input to bind the seek to the iput file itself
   // if provided after, it will bind to the output, converting the whole
   // input file before extracting the frame from the converted output (v slow)
-  const cmd = `-ss ${argv.time} -i "${infile}" -vframes 1 "${outfile}"`;
+  const cmd = `-ss ${time} -i "${infile}" -vframes 1 "${outfile}"`;
 
   await ffmpeg(cmd);
 }
