@@ -28,7 +28,7 @@
     "chalk": "^2.4.2",
     "ffbinaries": "^1.1.4",
     "globby": "^8.0.2",
-    "jpeg-js": "^0.3.7",
+    "jpeg-js": "^0.4.2",
     "rootrequire": "^1.0.0",
     "shellton": "^5.0.0",
     "through2": "^2.0.5",
