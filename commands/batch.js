@@ -14,26 +14,27 @@ function commandYargs(builder) {
   return parser.argv;
 }
 
-async function handler(argv) {
-  const command = require(`./${argv.command}.js`);
-  const files = (await globby(argv.globs)).sort((a, b) => {
+async function handler({ command, globs, dry }) {
+  const { builder, handler } = require(`./${command}.js`);
+
+  const files = (await globby(globs)).sort((a, b) => {
     return a.localeCompare(b);
   });
 
-  if (argv.dry) {
+  if (dry) {
     log.info('batch process files:');
     log.info(files.join('\n'));
 
     return;
   }
 
-  const commandArgv = commandYargs(command.builder);
+  const commandArgv = commandYargs(builder);
 
   for (let file of files) {
     log.info('processing file:', file);
 
     try {
-      await command.handler(Object.assign({}, commandArgv, {
+      await handler(Object.assign({}, commandArgv, {
         input: file
       }));
     } catch(e) {
