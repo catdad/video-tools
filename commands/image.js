@@ -5,7 +5,8 @@ const { rename, log } = require('../lib/util.js');
 
 async function handler({ input, output, time }) {
   const infile = path.resolve(input);
-  const outfile = output || rename(infile, {
+  const outfile = rename(infile, {
+    output,
     suffix: `-${time.replace(/:/g, '.')}`,
     ext: '.png'
   });

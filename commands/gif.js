@@ -17,7 +17,8 @@ function serializeFilter({ framerate = 10, scale = 480, quality = 'low' }) {
 
 async function handler({ seek, duration, output, ...argv }) {
   const infile = path.resolve(argv.input);
-  const outfile = output || rename(infile, {
+  const outfile = rename(infile, {
+    output,
     prefix: argv.prefix,
     suffix: argv.suffix,
     ext: '.gif'
