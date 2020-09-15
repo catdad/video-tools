@@ -1,8 +1,12 @@
 #!/usr/bin/env node
 
+const commands = require('./index.js');
+
 // eslint-disable-next-line no-unused-vars
-var argv = require('yargs')
-.commandDir('commands')
-.demandCommand()
-.help()
-.argv;
+commands.reduce(
+  (yargs, { command, describe, builder, handler }) => yargs.command(command, describe, builder, handler),
+  require('yargs')
+)
+  .demandCommand()
+  .help()
+  .argv;
