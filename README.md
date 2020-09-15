@@ -8,7 +8,13 @@ Among other things, this tool can convert videos among all sorts of formats, app
 
 This project requires Node.JS. Install that first. That part is up to you to figure out. I like using all the fancy language bits though, so install the latest version of it.
 
-After that, you get this project from GitHub. That's it.
+To install the package once, you can get the latest version like this:
+
+```bash
+npm install --global https://github.com/catdad/video-tools/tarball/master
+```
+
+If you prefer to work with the repository directly, you can clone it:
 
 ```bash
 git clone git@github.com:catdad/video-tools.git
@@ -19,7 +25,7 @@ npm install
 npm link
 ```
 
-Now you can execute all the commands for this tool, from anywhere, by typing `vid`.
+In both cases, this will create a global CLI named `vid` that you can use to access all the functionality of this utility.
 
 This project uses `ffmpeg` and `ffprobe` to deliver its functionality. It will fetch a copy of the necessary binaries at install time.
 
