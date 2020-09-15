@@ -21,7 +21,7 @@ npm link
 
 Now you can execute all the commands for this tool, from anywhere, by typing `vid`.
 
-This project will fetch a copy of `ffmpeg` for you. Right now, it will only do so on Windows and Mac. If you need Linux, you can install it yourself, or submit a PR.
+This project uses `ffmpeg` and `ffprobe` to deliver its functionality. It will fetch a copy of the necessary binaries at install time.
 
 ## Usage
 
