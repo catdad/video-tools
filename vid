@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+process.env.VID_LOGGING = 1;
+
 const commands = require('./index.js');
 
 // eslint-disable-next-line no-unused-vars
