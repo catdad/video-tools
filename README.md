@@ -33,7 +33,7 @@ vid <command>
 Commands:
   vid batch <command> [globs..]    execute any other command on a glob of files
   vid container <input> [options]  switch format container without transcoding
-  vid desktop [options]            switch format container without transcoding
+  vid desktop [options]            capture screen video
   vid ffmpeg [options]             ffmpeg passthrough
   vid ffprobe [options]            ffprode passthrough
   vid gif <input> [options]        create a gif from a video

@@ -84,7 +84,7 @@ async function handler({ ...argv }) {
 
 module.exports = {
   command: 'desktop [options]',
-  describe: 'switch format container without transcoding',
+  describe: 'capture screen video',
   builder: function (yargs) {
     yargs
     .option('output', {
