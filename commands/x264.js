@@ -9,12 +9,12 @@ function codecs(opts) {
   const a = 'libmp3lame';
 
   switch(true) {
-    case opts.v && opts.a:
-    case !opts.v && !opts.a:
+    case opts.video && opts.audio:
+    case !opts.video && !opts.audio:
       return `-vcodec ${v} -acodec ${a}`;
-    case opts.v:
+    case opts.video:
       return `-vcodec ${v} -acodec copy`;
-    case opts.a:
+    case opts.audio:
       return `-vcodec copy -acodec ${a}`;
   }
 
