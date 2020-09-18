@@ -8,6 +8,6 @@ const commands = fs.readdirSync(commandsDir)
   .map(f => ({ name: f.replace(/\.js$/, ''), path: path.resolve(commandsDir, f) }))
   .map(obj => ({ ...require(obj.path), ...obj }));
 
-const map = commands.reduce((obj, { name, builder }) => ({ ...obj, [name]: builder }), {});
+const map = commands.reduce((obj, { name, handler }) => ({ ...obj, [name]: handler }), {});
 
 module.exports = { commands, map };
