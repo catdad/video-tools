@@ -3,7 +3,7 @@ const path = require('path');
 const { ffmpeg } = require('../lib/ffmpeg.js');
 const { rename, log } = require('../lib/util.js');
 
-async function handler({ input, format, ...argv }) {
+async function handler({ input, format, stdout, stderr, ...argv }) {
   const infile = path.resolve(input);
   const outfile = rename(infile, {
     ext: `.${format}`,
@@ -18,7 +18,9 @@ async function handler({ input, format, ...argv }) {
   }
 
   // ffmpeg -i %1 -vcodec copy -acodec copy -movflags faststart %2
-  await ffmpeg(`-i "${infile}" -vcodec copy -acodec copy ${format === 'mp4' ? '-movflags faststart' : ''} "${outfile}"`);
+  const cmd = `-i "${infile}" -vcodec copy -acodec copy ${format === 'mp4' ? '-movflags faststart' : ''} "${outfile}"`;
+
+  await ffmpeg(cmd, { stdout, stderr });
 }
 
 module.exports = {

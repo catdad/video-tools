@@ -57,7 +57,7 @@ async function rateAsync(argv, infile) {
   return `-r ${argv.framerate}`;
 }
 
-async function handler(argv) {
+async function handler({ stdout, stderr, ...argv }) {
   const infile = path.resolve(argv.input);
   const outfile = rename(infile, {
     prefix: argv.prefix,
@@ -77,7 +77,7 @@ async function handler(argv) {
   // ffmpeg -i %1 -vcodec libx264 -acodec libmp3lame -movflags faststart -threads 2 %2
   const cmd = `-i "${infile}" ${codecs(argv)} ${size(argv)} ${framerate} -movflags faststart -threads ${Math.floor(argv.threads)} "${outfile}"`;
 
-  await ffmpeg(cmd);
+  await ffmpeg(cmd, { stdout, stderr });
 }
 
 module.exports = {
