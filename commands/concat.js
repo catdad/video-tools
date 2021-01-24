@@ -32,7 +32,7 @@ async function handler({ format, stdout, stderr, _: files, ...argv }) {
     throw new Error('input and output are the same');
   }
 
-  const cmd = `-f concat -safe 0 -i "${infile}" ${format === 'mp4' ? '-movflags faststart' : ''} "${outfile}"`;
+  const cmd = `-f concat -safe 0 -i "${infile}" -vcodec copy -acodec copy ${format === 'mp4' ? '-movflags faststart' : ''} "${outfile}"`;
 
   await ffmpeg(cmd, { stdout, stderr });
 
