@@ -19,11 +19,11 @@ function lutPath(file) {
   .replace(':', '\\\\:');
 }
 
-async function handler(argv) {
-  const lutfile = lutPath(argv.lut);
-  const infile = path.resolve(argv.input);
-  const outfile = argv.out ?
-    path.resolve(argv.out) :
+async function handler({ lut, input, output }) {
+  const lutfile = lutPath(lut);
+  const infile = path.resolve(input);
+  const outfile = output ?
+    path.resolve(output) :
     rename(infile, {
       suffix: `.${path.basename(lutfile)}`
     });
@@ -42,11 +42,13 @@ module.exports = {
     yargs
     .option('lut', {
       type: 'string',
+      alias: 'l',
       describe: 'the LUT file to use'
     })
-    .option('out', {
+    .option('output', {
       type: 'string',
-      describe: 'where to write the file'
+      alias: 'o',
+      describe: 'the output name'
     })
   },
   handler
