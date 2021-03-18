@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const symbols = require('./lib/symbols.js');
 
 const commandsDir = path.resolve(__dirname, 'commands');
 
@@ -10,4 +11,4 @@ const commands = fs.readdirSync(commandsDir)
 
 const map = commands.reduce((obj, { name, handler }) => ({ ...obj, [name]: handler }), {});
 
-module.exports = { commands, map };
+module.exports = { ...symbols, commands, map };
