@@ -1,7 +1,9 @@
 const path = require('path');
+const through = require('through2');
 
 const { ffmpeg } = require('../lib/ffmpeg.js');
 const { rename, log } = require('../lib/util.js');
+const { SYMBOL_RETURN_STDOUT } = require('../lib/symbols.js');
 
 function lutPath(file) {
   const filepath = path.resolve(file);
@@ -19,20 +21,45 @@ function lutPath(file) {
   .replace(':', '\\\\:');
 }
 
-async function handler(argv) {
-  const lutfile = lutPath(argv.lut);
-  const infile = path.resolve(argv.input);
-  const outfile = argv.out ?
-    path.resolve(argv.out) :
+async function handler({ stdout, stderr, lut, input, output }) {
+  let lib = false;
+
+  if (output === SYMBOL_RETURN_STDOUT) {
+    output = '-';
+    lib = true;
+  }
+
+  const lutfile = lutPath(lut);
+  const infile = path.resolve(input);
+  const outfile = output ?
+    path.resolve(output) :
     rename(infile, {
       suffix: `.${path.basename(lutfile)}`
     });
 
-  log.info('lut:   ', lutfile);
-  log.info('input: ', infile);
-  log.info('output:', outfile);
+  if (output !== '-') {
+    log.info('lut:   ', lutfile);
+    log.info('input: ', infile);
+    log.info('output:', outfile);
+  }
 
-  await ffmpeg(`-i "${infile}" -vf lut3d="${lutfile}" -movflags faststart "${outfile}"`);
+  const data = [];
+
+  let cmd = `-i "${infile}" -vf lut3d="${lutfile}" -movflags faststart`;
+
+  if (output === '-') {
+    stdout = through();
+    stdout.on('data', chunk => lib ? data.push(chunk) : process.stdout.write(chunk));
+    cmd += ` -f mjpeg -`;
+  } else {
+    cmd += ` "${outfile}"`;
+  }
+
+  await ffmpeg(cmd, { stdout, stderr });
+
+  if (data.length) {
+    return Buffer.concat(data);
+  }
 }
 
 module.exports = {
@@ -42,11 +69,13 @@ module.exports = {
     yargs
     .option('lut', {
       type: 'string',
+      alias: 'l',
       describe: 'the LUT file to use'
     })
-    .option('out', {
+    .option('output', {
       type: 'string',
-      describe: 'where to write the file'
+      alias: 'o',
+      describe: 'the output name'
     })
   },
   handler
