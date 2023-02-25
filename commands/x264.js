@@ -4,21 +4,16 @@ const { ffmpeg } = require('../lib/ffmpeg.js');
 const meta = require('../lib/meta.js');
 const { rename, log } = require('../lib/util.js');
 
-function codecs(opts) {
-  const v = 'libx264';
-  const a = 'libmp3lame';
+function codecs({ audio = 'copy', video = 'copy' } = {}) {
+  const map = {
+    h264: 'libx264',
+    mp3: 'libmp3lame',
+    // none of the available builds seem to have this library available
+    // aac: 'libfdk_aac',
+    aac: 'aac'
+  };
 
-  switch(true) {
-    case opts.video && opts.audio:
-    case !opts.video && !opts.audio:
-      return `-vcodec ${v} -acodec ${a}`;
-    case opts.video:
-      return `-vcodec ${v} -acodec copy`;
-    case opts.audio:
-      return `-vcodec copy -acodec ${a}`;
-  }
-
-  throw new Error('bad codec options');
+  return `-vcodec ${map[video] || 'copy'} -acodec ${map[audio] || 'copy'}`;
 }
 
 function size(argv) {
@@ -74,8 +69,14 @@ async function handler({ stdout, stderr, ...argv }) {
 
   const framerate = await rateAsync(argv, infile);
 
-  // ffmpeg -i %1 -vcodec libx264 -acodec libmp3lame -movflags faststart -threads 2 %2
   const cmd = `-i "${infile}" ${codecs(argv)} ${size(argv)} ${framerate} -movflags faststart -threads ${Math.floor(argv.threads)} "${outfile}"`;
+
+  if (argv.dry) {
+    console.log(argv);
+    console.log('');
+    log.warn(`ffmpeg ${cmd}`);
+    return;
+  }
 
   await ffmpeg(cmd, { stdout, stderr });
 }
@@ -101,16 +102,16 @@ module.exports = {
       describe: 'the output name'
     })
     .option('video', {
-      type: 'boolean',
+      type: 'string',
       alias: 'v',
-      describe: 'convert only video',
-      default: false
+      describe: 'how to convert video: [h264, copy]',
+      default: 'h264'
     })
     .option('audio', {
-      type: 'boolean',
+      type: 'string',
       alias: 'a',
-      describe: 'convert only audio',
-      default: false
+      describe: 'how to encode audio: [mp3, aac, copy]',
+      default: 'mp3'
     })
     .option('width', {
       type: 'number',
@@ -132,6 +133,11 @@ module.exports = {
       alias: 't',
       describe: 'number of threads to use for transcoding',
       default: 2
+    })
+    .options('dry', {
+      type: 'boolean',
+      describe: 'perform dry run and log ffmpeg command',
+      default: false
     });
   },
   handler
