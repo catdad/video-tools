@@ -110,8 +110,8 @@ module.exports = {
     .option('audio', {
       type: 'string',
       alias: 'a',
-      describe: 'how to encode audio: [mp3, aac, copy]',
-      default: 'mp3'
+      describe: 'how to encode audio: [aac, mp3, copy]',
+      default: 'aac'
     })
     .option('width', {
       type: 'number',
