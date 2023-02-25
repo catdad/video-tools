@@ -29,7 +29,6 @@
     "ffbinaries": "^1.1.4",
     "globby": "^11.0.4",
     "jpeg-js": "^0.4.2",
-    "rootrequire": "^1.0.0",
     "shellton": "^5.1.0",
     "tempy": "^1.0.0",
     "through2": "^2.0.5",
