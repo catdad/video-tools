@@ -69,7 +69,7 @@ async function handler({ stdout, stderr, ...argv }) {
 
   const framerate = await rateAsync(argv, infile);
 
-  const cmd = `-i "${infile}" ${codecs(argv)} ${size(argv)} ${framerate} -movflags faststart -threads ${Math.floor(argv.threads)} "${outfile}"`;
+  const cmd = `-i "${infile}" ${size(argv)} ${codecs(argv)} ${framerate} -movflags faststart -threads ${Math.floor(argv.threads)} "${outfile}"`;
 
   if (argv.dry) {
     console.log(argv);
