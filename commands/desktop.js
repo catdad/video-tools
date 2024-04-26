@@ -62,7 +62,7 @@ async function screenInfo() {
 
 async function screenRecord({ output = 'video-recording.mp4', os = OS, ...argv }) {
   const outfile = path.resolve('.', output);
-  const cmd = `${captureSerializer(os, argv)} "${outfile}`;
+  const cmd = `${captureSerializer(os, argv)} "${outfile}"`;
 
   log.info('output:', outfile);
   log.info(`ffmpeg ${cmd}`);
