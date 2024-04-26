@@ -24,21 +24,15 @@ function isNumber(val) {
 function captureSerializer(os, { width, height, x, y }) {
   // https://trac.ffmpeg.org/wiki/Capture/Desktop
 
-  const videoSize = isNumber(width * height) ?
-    `-video_size ${width}x${height} -show_region 1` :
-    '';
-
   if (os === 'win') {
-    return `-f gdigrab -framerate 30 -offset_x ${x} -offset_y ${y} ${videoSize} -i desktop`;
+    return `-f gdigrab -framerate 30 -offset_x ${x} -offset_y ${y} -video_size ${width}x${height} -i desktop`;
   }
 
   if (os === 'osx') {
     // TODO it's not always device 1
     
-    // -vf "crop=out_w:out_h:x:y"
-    console.log({ x, y, width, height });
-
-    return `-f avfoundation -i 1 -pix_fmt yuv420p -r 30 -vf "crop=1200:1200:100:100, scale=600:-1"`;
+    return `-f avfoundation -capture_cursor 1 -i 1 -pix_fmt yuv420p -r 30 -vf "crop=${width}:${height}:${x}:${y}"`;
+    // return `-f avfoundation -i 1 -pix_fmt yuv420p -r 30 -vf "crop=${width}:${height}:${x}:${y}, scale=600:-1"`;
   }
 
   throw new Error(`${os.toUpperCase()} operating system capture is not implemented`);
@@ -82,7 +76,7 @@ async function screenInfo({ os = OS } = {}) {
 
   const { width, height } = JPEG.decode(buff);
 
-  log.info({ width: width, height: height, ext: 'jpeg' });
+  return { width, height };
 }
 
 async function screenRecord({ output = 'video-recording.mp4', os = OS, ...argv }) {
@@ -96,15 +90,22 @@ async function screenRecord({ output = 'video-recording.mp4', os = OS, ...argv }
 }
 
 async function handler({ ...argv }) {
-  if (argv.info) {
-    return screenInfo();
-  }
-
   if (argv.list) {
     return listDevices({ ...argv });
   }
 
-  return screenRecord({ ...argv });
+  const { width, height } = await screenInfo({ ...argv });
+
+  if (argv.info) {
+    log.info({ width: width, height: height, ext: 'jpeg' });
+    return;
+  }
+
+  return screenRecord({
+    width: width - argv.x,
+    height: height - argv.y,
+    ...argv
+  });
 }
 
 module.exports = {
