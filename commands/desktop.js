@@ -21,17 +21,21 @@ function isNumber(val) {
   return Number(val) === val;
 }
 
-function captureSerializer(os, { width, height, x, y }) {
+function captureSerializer(os, { width, height, x, y, framerate, device }) {
   // https://trac.ffmpeg.org/wiki/Capture/Desktop
 
   if (os === 'win') {
-    return `-f gdigrab -framerate 30 -offset_x ${x} -offset_y ${y} -video_size ${width}x${height} -i desktop`;
+    return `-f gdigrab -framerate ${framerate} -offset_x ${x} -offset_y ${y} -video_size ${width}x${height} -i desktop`;
   }
 
   if (os === 'osx') {
     // TODO it's not always device 1
     
-    return `-f avfoundation -capture_cursor 1 -i 1 -pix_fmt yuv420p -r 30 -vf "crop=${width}:${height}:${x}:${y}"`;
+    // Note: on Mac, we need to set the framerate twice:
+    // * one for the source device (which screen capture ignores, but cameras need)
+    // * one for output processing, which is required to not record at the default 1000k for screen capture
+
+    return `-f avfoundation -capture_cursor 1 -framerate ${framerate} -i ${device} -pix_fmt yuv420p -r ${framerate}`; // -vf "crop=${width}:${height}:${x}:${y}"`;
     // return `-f avfoundation -i 1 -pix_fmt yuv420p -r 30 -vf "crop=${width}:${height}:${x}:${y}, scale=600:-1"`;
   }
 
@@ -54,7 +58,7 @@ async function listDevices({ os = OS }) {
   await ffmpeg(listSerializer(os)).catch(() => {});
 }
 
-async function screenInfo({ os = OS } = {}) {
+async function screenInfo({ os = OS, device, framerate } = {}) {
   const outStream = through();
 
   const command = (() => {
@@ -63,7 +67,7 @@ async function screenInfo({ os = OS } = {}) {
     }
 
     if (os === 'osx') {
-      return `-f avfoundation -i 1 -y -f mjpeg -vframes 1 -`;
+      return `-f avfoundation -framerate ${framerate} -i ${device} -r ${framerate} -y -f mjpeg -vframes 1 -`;
     }
 
     throw new Error(`${os.toUpperCase()} operating system screen info is not implemented`);
@@ -90,11 +94,17 @@ async function screenRecord({ output = 'video-recording.mp4', os = OS, ...argv }
 }
 
 async function handler({ ...argv }) {
+  const defaults = {
+    // TODO make configurable
+    framerate: 30,
+    device: 1,
+  };
+  
   if (argv.list) {
-    return listDevices({ ...argv });
+    return listDevices({ ...defaults, ...argv });
   }
 
-  const { width, height } = await screenInfo({ ...argv });
+  const { width, height } = await screenInfo({ ...defaults, ...argv });
 
   if (argv.info) {
     log.info({ width: width, height: height, ext: 'jpeg' });
@@ -102,6 +112,7 @@ async function handler({ ...argv }) {
   }
 
   return screenRecord({
+    ...defaults,
     width: width - argv.x,
     height: height - argv.y,
     ...argv
