@@ -32,12 +32,25 @@ function captureSerializer(os, { width, height, x, y }) {
     return `-f gdigrab -framerate 30 -offset_x ${x} -offset_y ${y} ${videoSize} -i desktop`;
   }
 
+  if (os === 'osx') {
+    // TODO it's not always device 1
+    
+    // -vf "crop=out_w:out_h:x:y"
+    console.log({ x, y, width, height });
+
+    return `-f avfoundation -i 1 -pix_fmt yuv420p -framerate 30 -vf "crop=400:400:100:100"`;
+  }
+
   throw new Error(`${os.toUpperCase()} operating system capture is not implemented`);
 }
 
 function listSerializer(os) {
   if (os === 'win') {
     return `-list_devices true -f dshow -i dummy`;
+  }
+
+  if (os === 'osx') {
+    return `-list_devices true -f avfoundation -i ""`;
   }
 
   throw new Error(`${os.toUpperCase()} operating system device list is not implemented`);
@@ -47,12 +60,24 @@ async function listDevices({ os = OS }) {
   await ffmpeg(listSerializer(os)).catch(() => {});
 }
 
-async function screenInfo() {
+async function screenInfo({ os = OS } = {}) {
   const outStream = through();
+
+  const command = (() => {
+    if (os === 'win') {
+      return `-f gdigrab -i desktop -y -f mjpeg -vframes 1 -`;
+    }
+
+    if (os === 'osx') {
+      return `-f avfoundation -i 1 -y -f mjpeg -vframes 1 -`;
+    }
+
+    throw new Error(`${os.toUpperCase()} operating system screen info is not implemented`);
+  })();
 
   const [buff] = await Promise.all([
     readStream(outStream),
-    ffmpeg(`-f gdigrab -i desktop -y -f mjpeg -vframes 1 -`, { stdout: outStream })
+    ffmpeg(command, { stdout: outStream })
   ]);
 
   const { width, height } = JPEG.decode(buff);
