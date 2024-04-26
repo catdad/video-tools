@@ -38,7 +38,7 @@ function captureSerializer(os, { width, height, x, y }) {
     // -vf "crop=out_w:out_h:x:y"
     console.log({ x, y, width, height });
 
-    return `-f avfoundation -i 1 -pix_fmt yuv420p -framerate 30 -vf "crop=400:400:100:100"`;
+    return `-f avfoundation -i 1 -pix_fmt yuv420p -r 30 -vf "crop=1200:1200:100:100, scale=600:-1"`;
   }
 
   throw new Error(`${os.toUpperCase()} operating system capture is not implemented`);
