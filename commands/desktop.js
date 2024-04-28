@@ -24,6 +24,8 @@ function isNumber(val) {
 function captureSerializer(os, { width, height, x, y, framerate, device }) {
   // https://trac.ffmpeg.org/wiki/Capture/Desktop
 
+  // TODO implement encoding preset (e.g. ultrafast for slow CPUs)
+
   if (os === 'win') {
     // TODO windows hates the default width/height arguments (multiscreen issue?)
     // TODO make offset and video size optional
@@ -38,6 +40,7 @@ function captureSerializer(os, { width, height, x, y, framerate, device }) {
     // * one for output processing, which is required to not record at the default 1000k for screen capture
 
     // TODO make offset and video size optional
+    // TODO add -c:v libx264
 
     return `-f avfoundation -capture_cursor 1 -framerate ${framerate} -i ${device} -pix_fmt yuv420p -r ${framerate} -movflags faststart`; // -vf "crop=${width}:${height}:${x}:${y}"`;
     // return `-f avfoundation -i 1 -pix_fmt yuv420p -r 30 -vf "crop=${width}:${height}:${x}:${y}, scale=600:-1"`;
