@@ -105,18 +105,30 @@ async function handler({ ...argv }) {
     return listDevices({ ...defaults, ...argv });
   }
 
-  const { width, height } = await screenInfo({ ...defaults, ...argv });
-
   if (argv.info) {
+    const { width, height } = await screenInfo({ ...defaults, ...argv });
     log.info({ width: width, height: height, ext: 'jpeg' });
     return;
   }
 
+  const { width, height } = await (async () => {
+    if (argv.width && argv.height) {
+      return { width: argv.width, height: argv.height };
+    }
+
+    const { width, height } = await screenInfo({ ...defaults, ...argv });
+
+    return {
+      width: width - argv.x,
+      height: height - argv.y
+    };
+  })();
+
   return screenRecord({
     ...defaults,
-    width: width - argv.x,
-    height: height - argv.y,
-    ...argv
+    ...argv,
+    width,
+    height
   });
 }
 
