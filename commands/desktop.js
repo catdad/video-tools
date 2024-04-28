@@ -25,6 +25,7 @@ function captureSerializer(os, { width, height, x, y, framerate, device }) {
   // https://trac.ffmpeg.org/wiki/Capture/Desktop
 
   if (os === 'win') {
+    // TODO windows hates the default width/height arguments (multiscreen issue?)
     return `-f gdigrab -framerate ${framerate} -offset_x ${x} -offset_y ${y} -video_size ${width}x${height} -i desktop`;
   }
 
@@ -83,14 +84,14 @@ async function screenInfo({ os = OS, device, framerate } = {}) {
   return { width, height };
 }
 
-async function screenRecord({ output = 'video-recording.mp4', os = OS, ...argv }) {
+async function screenRecord({ output = 'video-recording.mp4', os = OS, stdin, ...argv }) {
   const outfile = path.resolve('.', output);
   const cmd = `${captureSerializer(os, argv)} "${outfile}"`;
 
   log.info('output:', outfile);
   log.info(`ffmpeg ${cmd}`);
 
-  await ffmpeg(`${cmd}`);
+  await ffmpeg(`${cmd}`, { stdin });
 }
 
 async function handler({ ...argv }) {
@@ -99,7 +100,7 @@ async function handler({ ...argv }) {
     framerate: 30,
     device: 1,
   };
-  
+
   if (argv.list) {
     return listDevices({ ...defaults, ...argv });
   }
