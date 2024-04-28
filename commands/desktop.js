@@ -31,7 +31,7 @@ function captureSerializer(os, { width, height, x, y, framerate, device }) {
 
   if (os === 'osx') {
     // TODO it's not always device 1
-    
+
     // Note: on Mac, we need to set the framerate twice:
     // * one for the source device (which screen capture ignores, but cameras need)
     // * one for output processing, which is required to not record at the default 1000k for screen capture
