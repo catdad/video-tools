@@ -84,14 +84,14 @@ async function screenInfo({ os = OS, device, framerate } = {}) {
   return { width, height };
 }
 
-async function screenRecord({ output = 'video-recording.mp4', os = OS, stdin, ...argv }) {
+async function screenRecord({ output = 'video-recording.mp4', os = OS, stdin, stdout, stderr, ...argv }) {
   const outfile = path.resolve('.', output);
   const cmd = `${captureSerializer(os, argv)} "${outfile}"`;
 
   log.info('output:', outfile);
   log.info(`ffmpeg ${cmd}`);
 
-  await ffmpeg(`${cmd}`, { stdin });
+  await ffmpeg(`${cmd}`, { stdin, stdout, stderr });
 }
 
 async function handler({ ...argv }) {
