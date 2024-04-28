@@ -27,7 +27,7 @@ function captureSerializer(os, { width, height, x, y, framerate, device }) {
   if (os === 'win') {
     // TODO windows hates the default width/height arguments (multiscreen issue?)
     // TODO make offset and video size optional
-    return `-f gdigrab -framerate ${framerate} -offset_x ${x} -offset_y ${y} -video_size ${width}x${height} -i desktop`;
+    return `-f gdigrab -framerate ${framerate} -offset_x ${x} -offset_y ${y} -video_size ${width}x${height} -i desktop -c:v libx264 -pix_fmt yuv420p -movflags faststart`;
   }
 
   if (os === 'osx') {
@@ -39,7 +39,7 @@ function captureSerializer(os, { width, height, x, y, framerate, device }) {
 
     // TODO make offset and video size optional
 
-    return `-f avfoundation -capture_cursor 1 -framerate ${framerate} -i ${device} -pix_fmt yuv420p -r ${framerate}`; // -vf "crop=${width}:${height}:${x}:${y}"`;
+    return `-f avfoundation -capture_cursor 1 -framerate ${framerate} -i ${device} -pix_fmt yuv420p -r ${framerate} -movflags faststart`; // -vf "crop=${width}:${height}:${x}:${y}"`;
     // return `-f avfoundation -i 1 -pix_fmt yuv420p -r 30 -vf "crop=${width}:${height}:${x}:${y}, scale=600:-1"`;
   }
 
