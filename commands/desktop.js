@@ -27,9 +27,13 @@ function captureSerializer(os, { width, height, x, y, framerate, device }) {
   // TODO implement encoding preset (e.g. ultrafast for slow CPUs)
 
   if (os === 'win') {
+    const videoSize = isNumber(width * height) ?
+      `-video_size ${width}x${height}` :
+      '';
+
     // TODO windows hates the default width/height arguments (multiscreen issue?)
     // TODO make offset and video size optional
-    return `-f gdigrab -framerate ${framerate} -offset_x ${x} -offset_y ${y} -video_size ${width}x${height} -i desktop -c:v libx264 -pix_fmt yuv420p -movflags faststart`;
+    return `-f gdigrab -framerate ${framerate} -offset_x ${x} -offset_y ${y} ${videoSize} -i desktop -c:v libx264 -pix_fmt yuv420p -movflags faststart`;
   }
 
   if (os === 'osx') {
@@ -42,7 +46,11 @@ function captureSerializer(os, { width, height, x, y, framerate, device }) {
     // TODO make offset and video size optional
     // TODO add -c:v libx264
 
-    return `-f avfoundation -capture_cursor 1 -framerate ${framerate} -i ${device} -pix_fmt yuv420p -r ${framerate} -movflags faststart`; // -vf "crop=${width}:${height}:${x}:${y}"`;
+    const videoSize = isNumber(width * height) ?
+      `-vf "crop=${width}:${height}:${x}:${y}"` :
+      '';
+
+    return `-f avfoundation -capture_cursor 1 -framerate ${framerate} -i ${device} -pix_fmt yuv420p -r ${framerate} ${videoSize} -movflags faststart`;
     // return `-f avfoundation -i 1 -pix_fmt yuv420p -r 30 -vf "crop=${width}:${height}:${x}:${y}, scale=600:-1"`;
   }
 
@@ -117,24 +125,9 @@ async function handler({ ...argv }) {
     return;
   }
 
-  const { width, height } = await (async () => {
-    if (argv.width && argv.height) {
-      return { width: argv.width, height: argv.height };
-    }
-
-    const { width, height } = await screenInfo({ ...defaults, ...argv });
-
-    return {
-      width: width - argv.x,
-      height: height - argv.y
-    };
-  })();
-
   return screenRecord({
     ...defaults,
     ...argv,
-    width,
-    height
   });
 }
 
