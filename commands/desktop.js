@@ -109,24 +109,17 @@ async function screenRecord({ output = 'video-recording.mp4', os = OS, stdin, st
 }
 
 async function handler({ ...argv }) {
-  const defaults = {
-    // TODO make configurable
-    framerate: 30,
-    device: 1,
-  };
-
   if (argv.list) {
-    return listDevices({ ...defaults, ...argv });
+    return listDevices({ ...argv });
   }
 
   if (argv.info) {
-    const { width, height } = await screenInfo({ ...defaults, ...argv });
+    const { width, height } = await screenInfo({ ...argv });
     log.info({ width: width, height: height, ext: 'jpeg' });
     return;
   }
 
   return screenRecord({
-    ...defaults,
     ...argv,
   });
 }
@@ -136,11 +129,6 @@ module.exports = {
   describe: 'capture screen video',
   builder: function (yargs) {
     yargs
-    .option('output', {
-      type: 'string',
-      describe: 'the output file',
-      alias: 'o'
-    })
     .option('info', {
       type: 'boolean',
       default: false,
@@ -149,6 +137,11 @@ module.exports = {
     .option('list', {
       type: 'boolean',
       default: false
+    })
+    .option('output', {
+      type: 'string',
+      describe: 'the output file',
+      alias: 'o'
     })
     .option('width', {
       type: 'number',
@@ -171,7 +164,21 @@ module.exports = {
       alias: 'y',
       default: 0,
       describe: 'y-axis offset for the capture area'
+    })
+    .options('framerate', {
+      type: 'number',
+      describe: 'the video framerate',
+      default: 30,
+      alias: 'f'
     });
+
+    if (process.platform === 'darwin' || true) {
+      yargs.options('device', {
+        type: 'number',
+        describe: 'the video device to capture\nusually 1 on a MacBook\nrun `vid desktop --list` for more info',
+        default: 1
+      });
+    }
   },
   handler
 };
