@@ -31,19 +31,14 @@ function captureSerializer(os, { width, height, x, y, framerate, device }) {
       `-video_size ${width}x${height}` :
       '';
 
-    // TODO windows hates the default width/height arguments (multiscreen issue?)
-    // TODO make offset and video size optional
     return `-f gdigrab -framerate ${framerate} -offset_x ${x} -offset_y ${y} ${videoSize} -i desktop -c:v libx264 -pix_fmt yuv420p -movflags faststart`;
   }
 
   if (os === 'osx') {
-    // TODO it's not always device 1
-
     // Note: on Mac, we need to set the framerate twice:
     // * one for the source device (which screen capture ignores, but cameras need)
     // * one for output processing, which is required to not record at the default 1000k for screen capture
 
-    // TODO make offset and video size optional
     // TODO add -c:v libx264
 
     const videoSize = isNumber(width * height) ?
