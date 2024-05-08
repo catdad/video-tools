@@ -54,18 +54,22 @@ function captureSerializer(os, { width, height, x, y, framerate, device }) {
 
 function listSerializer(os) {
   if (os === 'win') {
-    return `-list_devices true -f dshow -i dummy`;
+    return `-hide_banner -list_devices true -f dshow -i dummy`;
   }
 
   if (os === 'osx') {
-    return `-list_devices true -f avfoundation -i ""`;
+    return `-hide_banner -list_devices true -f avfoundation -i ""`;
   }
 
   throw new Error(`${os.toUpperCase()} operating system device list is not implemented`);
 }
 
-async function listDevices({ os = OS }) {
-  await ffmpeg(listSerializer(os)).catch(() => {});
+async function listDevices({ os = OS, stdin, stdout, stderr }) {
+  await ffmpeg(listSerializer(os), {
+    stdin,
+    stdout,
+    stderr
+  }).catch(() => {});
 }
 
 async function screenInfo({ os = OS, device, framerate } = {}) {
