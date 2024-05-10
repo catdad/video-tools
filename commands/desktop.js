@@ -13,7 +13,7 @@ const OS = (function (platform) {
     case 'darwin':
       return 'osx';
     default:
-      return 'linux';
+      return platform;
   }
 }(process.platform))
 
