@@ -21,7 +21,19 @@ function isNumber(val) {
   return Number(val) === val;
 }
 
-function captureSerializer(os, { width, height, x, y, framerate, device }) {
+function scaleSerializer(maxWidth, maxHeight) {
+  const def = -2;
+  const width = maxWidth ? `'min(${maxWidth},iw)'` : def;
+  const height = maxHeight ? `'min(${maxHeight},ih)'` : def;
+
+  if (width === def && height === def) {
+    return null;
+  }
+
+  return `scale=${width}:${height}`;
+}
+
+function captureSerializer(os, { width, height, x, y, framerate, device, maxWidth, maxHeight }) {
   // https://trac.ffmpeg.org/wiki/Capture/Desktop
 
   // TODO implement encoding preset (e.g. ultrafast for slow CPUs)
@@ -31,7 +43,9 @@ function captureSerializer(os, { width, height, x, y, framerate, device }) {
       `-video_size ${width}x${height}` :
       '';
 
-    return `-f gdigrab -framerate ${framerate} -offset_x ${x} -offset_y ${y} ${videoSize} -i desktop -c:v libx264 -pix_fmt yuv420p -movflags faststart`;
+    const scale = scaleSerializer(maxWidth, maxHeight);
+
+    return `-f gdigrab -framerate ${framerate} -offset_x ${x} -offset_y ${y} ${videoSize} -i desktop ${scale ? `-vf "${scale}"` : ''} -c:v libx264 -pix_fmt yuv420p -movflags faststart`;
   }
 
   if (os === 'osx') {
@@ -41,12 +55,13 @@ function captureSerializer(os, { width, height, x, y, framerate, device }) {
 
     // TODO add -c:v libx264
 
-    const videoSize = isNumber(width * height) ?
-      `-vf "crop=${width}:${height}:${x}:${y}"` :
-      '';
+    const crop = isNumber(width * height) ? `crop=${width}:${height}:${x}:${y}` : null;
+    const scale = scaleSerializer(maxWidth, maxHeight);
+    const effects = [crop, scale].filter(n => !!n).join(', ');
 
-    return `-f avfoundation -capture_cursor 1 -framerate ${framerate} -i ${device} -pix_fmt yuv420p -r ${framerate} ${videoSize} -movflags faststart`;
-    // return `-f avfoundation -i 1 -pix_fmt yuv420p -r 30 -vf "crop=${width}:${height}:${x}:${y}, scale=600:-1"`;
+    const vf = effects ? `-vf "${effects}"` : '';
+
+    return `-f avfoundation -capture_cursor 1 -framerate ${framerate} -i ${device} -r ${framerate} ${vf} -pix_fmt yuv420p -movflags faststart`;
   }
 
   throw new Error(`${os.toUpperCase()} operating system capture is not implemented`);
@@ -103,6 +118,10 @@ async function screenRecord({ output = 'video-recording.mp4', os = OS, stdin, st
 
   log.info('output:', outfile);
   log.info(`ffmpeg ${cmd}`);
+
+  if (argv.dry) {
+    return;
+  }
 
   await ffmpeg(`${cmd}`, { stdin, stdout, stderr });
 }
@@ -164,11 +183,24 @@ module.exports = {
       default: 0,
       describe: 'y-axis offset for the capture area'
     })
+    .option('max-width', {
+      type: 'number',
+      describe: 'width to scale the video down to'
+    })
+    .option('max-height', {
+      type: 'number',
+      describe: 'height to scale the video down to'
+    })
     .options('framerate', {
       type: 'number',
       describe: 'the video framerate',
       default: 30,
       alias: 'f'
+    })
+    .options('dry', {
+      type: 'boolean',
+      default: false,
+      describe: 'print generated command without running it'
     });
 
     if (process.platform === 'darwin' || true) {
