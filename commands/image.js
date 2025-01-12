@@ -2,8 +2,9 @@ const path = require('path');
 
 const { ffmpeg } = require('../lib/ffmpeg.js');
 const { rename, log } = require('../lib/util.js');
+const { size } = require('../lib/filters.js');
 
-async function handler({ input, output, time }) {
+async function handler({ input, output, width, height, time, silent }) {
   const infile = path.resolve(input);
   const outfile = rename(infile, {
     output,
@@ -11,8 +12,10 @@ async function handler({ input, output, time }) {
     ext: '.png'
   });
 
-  log.info('input: ', infile);
-  log.info('output:', outfile);
+  if (!silent) {
+    log.info('input: ', infile);
+    log.info('output:', outfile);
+  }
 
   if (infile === outfile) {
     throw new Error('input and output are the same');
@@ -21,7 +24,7 @@ async function handler({ input, output, time }) {
   // seek before providing an input to bind the seek to the iput file itself
   // if provided after, it will bind to the output, converting the whole
   // input file before extracting the frame from the converted output (v slow)
-  const cmd = `-ss ${time} -i "${infile}" -vframes 1 "${outfile}"`;
+  const cmd = `${silent ? '-v quiet' : ''} -ss ${time} -i "${infile}" -vframes 1 ${size({ width, height })} "${outfile}"`;
 
   await ffmpeg(cmd);
 }
@@ -41,6 +44,19 @@ module.exports = {
       type: 'string',
       alias: 'o',
       describe: 'the output name'
+    })
+    .option('width', {
+      type: 'number',
+      describe: 'the width of the output image'
+    })
+    .option('height', {
+      type: 'number',
+      describe: 'the height of the output image'
+    })
+    .option('silent', {
+      type: 'boolean',
+      default: false,
+      describe: 'skip all logging'
     });
   },
   handler
