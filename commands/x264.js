@@ -3,6 +3,7 @@ const path = require('path');
 const { ffmpeg } = require('../lib/ffmpeg.js');
 const meta = require('../lib/meta.js');
 const { rename, log } = require('../lib/util.js');
+const { size } = require('../lib/filters.js');
 
 function codecs({ audio = 'copy', video = 'copy' } = {}) {
   const map = {
@@ -14,18 +15,6 @@ function codecs({ audio = 'copy', video = 'copy' } = {}) {
   };
 
   return `-vcodec ${map[video] || 'copy'} -acodec ${map[audio] || 'copy'}`;
-}
-
-function size(argv) {
-  const def = -2;
-  const width = argv.width ? `'min(${argv.width},iw)'` : def;
-  const height = argv.height ? `'min(${argv.height},ih)'` : def;
-
-  if (width === def && height === def) {
-    return '';
-  }
-
-  return `-vf scale=${width}:${height}`;
 }
 
 async function rateAsync(argv, infile) {
