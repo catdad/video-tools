@@ -15,12 +15,12 @@
     "type": "git",
     "url": "git+https://github.com/catdad/video-tools.git"
   },
-  "author": "Kiril Vatev <vatev.1@gmail.com>",
+  "author": "Kiril Vatev",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/catdad/video-tools/issues"
   },
-  "homepage": "https://github.com/catdad/video-tools#readme",
+  "homepage": "https://github.com/catdad/video-tools",
   "engines": {
     "node": ">=8.0.0"
   },

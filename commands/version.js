@@ -15,7 +15,7 @@ module.exports = {
     const { stdout: ffprobeOut } = await ffprobe('-version', { stdout: null, stderr: null });
     const { stdout: ffmpegOut } = await ffmpeg('-version', { stdout: null, stderr: null });
 
-    const libVersion = `${pkg.name} version ${pkg.version} Copyright (c) ${pkg.author}`;
+    const libVersion = `${pkg.name} version ${pkg.version} ${pkg.homepage} Copyright (c) ${pkg.author}`;
     const ffmpegVersion = getVersion(ffmpegOut);
     const ffprobeVersion = getVersion(ffprobeOut);
 
