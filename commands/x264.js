@@ -57,8 +57,9 @@ async function handler({ stdout, stderr, ...argv }) {
   }
 
   const framerate = await rateAsync(argv, infile);
+  const crf = framerate ? '' : `-crf ${argv.crf}`;
 
-  const cmd = `-i "${infile}" ${size(argv)} ${codecs(argv)} ${framerate} -movflags faststart -threads ${Math.floor(argv.threads)} "${outfile}"`;
+  const cmd = `-i "${infile}" ${size(argv)} ${codecs(argv)} ${framerate} ${crf} -movflags faststart -threads ${Math.floor(argv.threads)} "${outfile}"`;
 
   if (argv.dry) {
     console.log(argv);
@@ -116,6 +117,13 @@ module.exports = {
       type: 'number',
       alias: 'f',
       describe: 'the desired video frame rate'
+    })
+    .option('crf', {
+      type: 'number',
+      // actual values are between 0 and 51
+      // sane values are between 18 and 28
+      describe: 'the desired constant rate factor, smaller is better quality, [18, 28]',
+      default: 23
     })
     .option('threads', {
       type: 'number',
