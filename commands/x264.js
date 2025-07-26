@@ -22,6 +22,10 @@ async function rateAsync(argv, infile) {
     return '';
   }
 
+  if (argv.input === 'pipe:0') {
+    return '';
+  }
+
   let fps;
 
   // find current frame rate
@@ -41,19 +45,28 @@ async function rateAsync(argv, infile) {
   return `-r ${argv.framerate}`;
 }
 
-async function handler({ input, output, stdout, stderr, ...argv }) {
-  const infile = input === 'pipe:0' ? input : path.resolve(input);
-  const outfile = output === 'pipe:1' ? output : rename(infile, {
+const io = ({ input, output, prefix, suffix }) => {
+  const infile = path.resolve(input);
+  const outfile = rename(infile, {
     output,
-    prefix: argv.prefix,
-    suffix: argv.suffix,
+    prefix,
+    suffix,
     ext: '.mp4'
   });
 
-  log.info('input: ', infile);
-  log.info('output:', outfile);
+  return {
+    input: input === 'pipe:0' ? input : `"${infile}"`,
+    output: output === 'pipe:1' ? `-f mp4 pipe:1` : `"${outfile}"`,
+  };
+};
 
-  const framerate = await rateAsync(argv, infile);
+async function handler({ stdout, stderr, ...argv }) {
+  const { input, output } = io(argv);
+
+  log.info('input: ', input);
+  log.info('output:', output);
+
+  const framerate = await rateAsync(argv, input);
   const preset = argv.preset ? `-preset ${argv.preset}` : '';
 
   const cmd = `-i "${infile}" ${size(argv)} ${codecs(argv)} ${framerate} -movflags faststart ${preset} -threads ${Math.floor(argv.threads)} "${outfile}"`;
@@ -65,7 +78,7 @@ async function handler({ input, output, stdout, stderr, ...argv }) {
     return;
   }
   
-  if (infile === outfile) {
+  if (input === output) {
     throw new Error('input and output are the same');
   }
 
