@@ -41,9 +41,10 @@ async function rateAsync(argv, infile) {
   return `-r ${argv.framerate}`;
 }
 
-async function handler({ stdout, stderr, ...argv }) {
-  const infile = path.resolve(argv.input);
-  const outfile = rename(infile, {
+async function handler({ input, output, stdout, stderr, ...argv }) {
+  const infile = input === 'pipe:0' ? input : path.resolve(input);
+  const outfile = output === 'pipe:1' ? output : rename(infile, {
+    output,
     prefix: argv.prefix,
     suffix: argv.suffix,
     ext: '.mp4'
