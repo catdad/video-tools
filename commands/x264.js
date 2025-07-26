@@ -57,8 +57,9 @@ async function handler({ stdout, stderr, ...argv }) {
   }
 
   const framerate = await rateAsync(argv, infile);
+  const preset = argv.preset ? `-preset ${argv.preset}` : '';
 
-  const cmd = `-i "${infile}" ${size(argv)} ${codecs(argv)} ${framerate} -movflags faststart -threads ${Math.floor(argv.threads)} "${outfile}"`;
+  const cmd = `-i "${infile}" ${size(argv)} ${codecs(argv)} ${framerate} -movflags faststart ${preset} -threads ${Math.floor(argv.threads)} "${outfile}"`;
 
   if (argv.dry) {
     console.log(argv);
@@ -116,6 +117,12 @@ module.exports = {
       type: 'number',
       alias: 'f',
       describe: 'the desired video frame rate'
+    })
+    .option('preset', {
+      type: 'string',
+      describe: 'ffmpeg preset to use',
+      default: 'medium',
+      choices: ['ultrafast', 'superfast', 'veryfast', 'faster', 'fast', 'medium', 'slow' , 'veryslow']
     })
     .option('threads', {
       type: 'number',
