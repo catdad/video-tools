@@ -52,10 +52,6 @@ async function handler({ stdout, stderr, ...argv }) {
   log.info('input: ', infile);
   log.info('output:', outfile);
 
-  if (infile === outfile) {
-    throw new Error('input and output are the same');
-  }
-
   const framerate = await rateAsync(argv, infile);
   const preset = argv.preset ? `-preset ${argv.preset}` : '';
 
@@ -66,6 +62,10 @@ async function handler({ stdout, stderr, ...argv }) {
     console.log('');
     log.warn(`ffmpeg ${cmd}`);
     return;
+  }
+  
+  if (infile === outfile) {
+    throw new Error('input and output are the same');
   }
 
   await ffmpeg(cmd, { stdout, stderr });
