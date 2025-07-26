@@ -58,8 +58,8 @@ async function handler({ stdout, stderr, ...argv }) {
   const cmd = `-i "${infile}" ${size(argv)} ${codecs(argv)} ${framerate} -movflags faststart ${preset} -threads ${Math.floor(argv.threads)} "${outfile}"`;
 
   if (argv.dry) {
-    console.log(argv);
-    console.log('');
+    log.info(argv);
+    log.info('');
     log.warn(`ffmpeg ${cmd}`);
     return;
   }
