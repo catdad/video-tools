@@ -135,7 +135,7 @@ module.exports = {
     .option('preset', {
       type: 'string',
       describe: 'ffmpeg preset to use',
-      default: 'medium',
+      // default: 'medium',
       choices: ['ultrafast', 'superfast', 'veryfast', 'faster', 'fast', 'medium', 'slow' , 'veryslow']
     })
     .option('threads', {
