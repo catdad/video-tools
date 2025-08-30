@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-process.env.VID_LOGGING = 1;
+process.env.VID_LOGGING = ['0', 'false'].includes(process.env.VID_LOGGING) ? '' : 1;
 
 const { commands } = require('./index.js');
 
