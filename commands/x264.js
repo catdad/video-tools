@@ -22,6 +22,10 @@ async function rateAsync(argv, infile) {
     return '';
   }
 
+  if (argv.input === 'pipe:0') {
+    return '';
+  }
+
   let fps;
 
   // find current frame rate
@@ -41,31 +45,42 @@ async function rateAsync(argv, infile) {
   return `-r ${argv.framerate}`;
 }
 
-async function handler({ stdout, stderr, ...argv }) {
-  const infile = path.resolve(argv.input);
+const io = ({ input, output, prefix, suffix }) => {
+  const infile = path.resolve(input);
   const outfile = rename(infile, {
-    prefix: argv.prefix,
-    suffix: argv.suffix,
+    output,
+    prefix,
+    suffix,
     ext: '.mp4'
   });
 
-  log.info('input: ', infile);
-  log.info('output:', outfile);
+  return {
+    input: input === 'pipe:0' ? input : `"${infile}"`,
+    output: output === 'pipe:1' ? `-f mp4 pipe:1` : `"${outfile}"`,
+  };
+};
 
-  if (infile === outfile) {
-    throw new Error('input and output are the same');
-  }
+async function handler({ stdout, stderr, ...argv }) {
+  const { input, output } = io(argv);
 
-  const framerate = await rateAsync(argv, infile);
+  log.info('input: ', input);
+  log.info('output:', output);
+
+  const framerate = await rateAsync(argv, input);
   const crf = framerate ? '' : `-crf ${argv.crf}`;
+  const preset = argv.preset ? `-preset ${argv.preset}` : '';
 
-  const cmd = `-i "${infile}" ${size(argv)} ${codecs(argv)} ${framerate} ${crf} -movflags faststart -threads ${Math.floor(argv.threads)} "${outfile}"`;
+  const cmd = `-i ${input} ${size(argv)} ${codecs(argv)} ${framerate} ${crf} -movflags frag_keyframe+faststart ${preset} -threads ${Math.floor(argv.threads)} ${output}`;
 
   if (argv.dry) {
-    console.log(argv);
-    console.log('');
+    log.info(argv);
+    log.info('');
     log.warn(`ffmpeg ${cmd}`);
     return;
+  }
+
+  if (input === output) {
+    throw new Error('input and output are the same');
   }
 
   await ffmpeg(cmd, { stdout, stderr });
@@ -124,6 +139,12 @@ module.exports = {
       // sane values are between 18 and 28
       describe: 'the desired constant rate factor, smaller is better quality, [18, 28]',
       default: 23
+    })
+    .option('preset', {
+      type: 'string',
+      describe: 'ffmpeg preset to use',
+      // default: 'medium',
+      choices: ['ultrafast', 'superfast', 'veryfast', 'faster', 'fast', 'medium', 'slow' , 'veryslow']
     })
     .option('threads', {
       type: 'number',
