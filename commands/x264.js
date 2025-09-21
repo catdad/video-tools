@@ -67,9 +67,10 @@ async function handler({ stdout, stderr, ...argv }) {
   log.info('output:', output);
 
   const framerate = await rateAsync(argv, input);
+  const crf = framerate ? '' : `-crf ${argv.crf}`;
   const preset = argv.preset ? `-preset ${argv.preset}` : '';
 
-  const cmd = `-i ${input} ${size(argv)} ${codecs(argv)} ${framerate} -movflags frag_keyframe+faststart ${preset} -threads ${Math.floor(argv.threads)} ${output}`;
+  const cmd = `-i ${input} ${size(argv)} ${codecs(argv)} ${framerate} ${crf} -movflags frag_keyframe+faststart ${preset} -threads ${Math.floor(argv.threads)} ${output}`;
 
   if (argv.dry) {
     log.info(argv);
@@ -77,7 +78,7 @@ async function handler({ stdout, stderr, ...argv }) {
     log.warn(`ffmpeg ${cmd}`);
     return;
   }
-  
+
   if (input === output) {
     throw new Error('input and output are the same');
   }
@@ -131,6 +132,13 @@ module.exports = {
       type: 'number',
       alias: 'f',
       describe: 'the desired video frame rate'
+    })
+    .option('crf', {
+      type: 'number',
+      // actual values are between 0 and 51
+      // sane values are between 18 and 28
+      describe: 'the desired constant rate factor, smaller is better quality, [18, 28]',
+      default: 23
     })
     .option('preset', {
       type: 'string',
