@@ -31,11 +31,11 @@
     "jpeg-js": "^0.4.4",
     "lodash": "^4.17.21",
     "shellton": "^5.1.0",
-    "tempy": "^1.0.0",
+    "tempy": "^3.2.0",
     "through2": "^2.0.5",
     "yargs": "^13.3.2"
   },
   "devDependencies": {
-    "eslint": "^5.16.0"
+    "eslint": "^10.0.0"
   }
 }
